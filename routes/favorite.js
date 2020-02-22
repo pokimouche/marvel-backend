@@ -5,28 +5,39 @@ const isAuthenticated = require("../middleware/isAuthenticated");
 
 router.post("/favorite/create", isAuthenticated, async (req, res) => {
   try {
-    favorite = new Favorite({
-      favoriteId: req.fields.favoriteId,
-      category: req.fields.categoryName,
-      favoriteUser: req.user
+    //check existence of the id
+    const checkId = await Favorite.findOne({
+      favoriteId: req.fields.favoriteId
     });
+    if (checkId === null) {
+      favorite = new Favorite({
+        favoriteId: req.fields.favoriteId,
+        category: req.fields.category,
+        favoriteUser: req.user
+      });
 
-    await favorite.save();
-    res.json(favorite.populate("user"));
+      await favorite.save();
+      res.status(200).json(favorite.populate("user"));
+    } else {
+      res.status(200).json({ message: "Ce favori est déja enregistré" });
+    }
   } catch (error) {
     res.json(error.message);
   }
 });
 
-// router.get("/favorite/id", isAuthenticated, async (req, res) => {
-//   try {
-//     favorite = await Favorite.find().populate({ _id: req.user.id });
+router.get("/favorite/:id", isAuthenticated, async (req, res) => {
+  try {
+    console.log(req.params.id);
+    favorite = await Favorite.find({
+      favoriteUser: { _id: req.params.id }
+    }).select("favoriteId category");
 
-//     res.json(favorite);
-//   } catch (error) {
-//     res.json(error.message);
-//   }
-// });
+    res.json(favorite);
+  } catch (error) {
+    res.json(error.message);
+  }
+});
 
 router.post("favorite/delete", isAuthenticated, async (req, res) => {
   try {
