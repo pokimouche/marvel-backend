@@ -26,11 +26,11 @@ router.post("/favorite/create", isAuthenticated, async (req, res) => {
   }
 });
 
-router.get("/favorite/:id", isAuthenticated, async (req, res) => {
+router.get("/favorites", isAuthenticated, async (req, res) => {
   try {
-    console.log(req.params.id);
+    console.log("user", req.user);
     favorite = await Favorite.find({
-      favoriteUser: { _id: req.params.id }
+      favoriteUser: { _id: req.user._id }
     }).select("favoriteId category");
 
     res.json(favorite);
@@ -42,7 +42,7 @@ router.get("/favorite/:id", isAuthenticated, async (req, res) => {
 router.post("favorite/delete", isAuthenticated, async (req, res) => {
   try {
     if (req.fields.id) {
-      const favorite = await Favorite.findById(req.fields.id);
+      const favorite = await Favorite.findOne({ favoriteId: req.fields.id });
       if (favorite) {
         await task.remove();
         res.status(200).json({ message: "Le favori a été supprimé" });
