@@ -28,12 +28,12 @@ router.get("/characters", async (req, res) => {
   }
 });
 
-router.get("/characters/:id", async (req, res) => {
+router.get("/characters/:id/comics", async (req, res) => {
   const id = req.params.id;
 
   try {
     const response = await axios.get(
-      `https://gateway.marvel.com/v1/public/characters?ts=${timeStamp}&apikey=${process.env.MARVEL_PUBLIC_KEY}&hash=${hash}&id=${id}`
+      `https://gateway.marvel.com/v1/public/characters/${id}/comics?ts=${timeStamp}&apikey=${process.env.MARVEL_PUBLIC_KEY}&hash=${hash}`
     );
 
     res.status(200).json({ message: response.data });
